@@ -34,6 +34,7 @@ typedef struct ball {
 } t_ball;
 
 typedef struct scene {
+	bool   running;
 	float  dt;
 	double last_fps_time;
 	double last_update_time;
@@ -46,6 +47,8 @@ typedef struct scene {
 	float	 friction;
 	t_vec2	 acceleration;
 } t_scene;
+
+void key_handler(GLFWwindow* window, int key, int scancode, int action, int mods);
 
 bool init_scene(t_scene* scene);
 void draw(t_scene* scene);

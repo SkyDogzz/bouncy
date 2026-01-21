@@ -1,6 +1,8 @@
 #include "bouncy.h"
 
 bool init_scene(t_scene* scene) {
+	scene->running = true;
+
 	scene->balls = NULL;
 
 	scene->acceleration.x = SCENE_ACCELERATION_X;

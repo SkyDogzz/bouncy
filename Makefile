@@ -18,7 +18,8 @@ OBJ_PATH := obj/
 
 SRC := main.c \
 			 balls.c \
-			 scene.c
+			 scene.c \
+			 handler.c
 
 SRCS := $(addprefix $(SRC_PATH), $(SRC))
 OBJS := $(addprefix $(OBJ_PATH), $(SRC:.c=.o))
