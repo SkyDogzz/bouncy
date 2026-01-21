@@ -22,6 +22,7 @@ typedef struct ball {
 	t_vec2 speed;
 	int	   triangle;
 	t_vec2 acceleration;
+	float  rebouce;
 	float  friction;
 } t_ball;
 

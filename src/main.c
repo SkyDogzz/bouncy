@@ -12,10 +12,10 @@ static void key_handler(GLFWwindow* window, int key, int scancode, int action, i
 	}
 	if (triangle_count && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
 		if (key == GLFW_KEY_RIGHT || key == GLFW_KEY_UP) {
-			(*triangle_count)++;
+			(*triangle_count) += 1;
 		} else if (key == GLFW_KEY_LEFT || key == GLFW_KEY_DOWN) {
 			if (*triangle_count > 3)
-				(*triangle_count)--;
+				(*triangle_count) -= 1;
 		}
 	}
 	(void)scancode;
@@ -28,48 +28,64 @@ t_ball* init_balls(t_ball* balls) {
 		return NULL;
 	balls->position.x = 0;
 	balls->position.y = 0;
-	balls->r = 100;
-	balls->speed.x = 10;
+	balls->r = 50;
+	balls->speed.x = 20;
 	balls->speed.y = 10;
 	balls->acceleration.x = 0;
 	balls->acceleration.y = 1;
-	balls->friction = 0.8;
+	balls->rebouce = 1 - 0.2;
+	balls->friction = 1 - 0.1;
 	return balls;
 }
 
-void draw_balls(t_ball* balls, int triangle_count) {
-	float  fi = (2.0f * M_PI) / triangle_count;
-	t_vec2 point[triangle_count + 1];
+const float colors[4][3] = {{1.f, 0.f, 0.f}, {0.f, 1.f, 0.f}, {0.f, 0.f, 1.f}, {1.f, 1.f, 0.f}};
+void		draw_balls(t_ball* balls, int triangle_count) {
+	   float  fi = (2.0f * M_PI) / triangle_count;
+	   t_vec2 point[triangle_count + 1];
 
-	for (int i = 0; i <= triangle_count; i++) {
-		float a = i * fi;
-		point[i].x = balls->r * cosf(a);
-		point[i].y = balls->r * sinf(a);
-	}
+	   for (int i = 0; i <= triangle_count; i++) {
+		   float a = i * fi;
+		   point[i].x = balls->r * cosf(a);
+		   point[i].y = balls->r * sinf(a);
+	   }
 
-	for (int i = 0; i < triangle_count; i++) {
-		glBegin(GL_TRIANGLES);
-		glColor3f(1.f, 0.f, 0.f);
-		glVertex2f(balls->position.x / WINDOW_WIDTH, balls->position.y / WINDOW_HEIGHT);
-		glVertex2f((balls->position.x + point[i].x) / WINDOW_WIDTH, (balls->position.y + point[i].y) / WINDOW_HEIGHT);
-		glVertex2f((balls->position.x + point[i + 1].x) / WINDOW_WIDTH,
-				   (balls->position.y + point[i + 1].y) / WINDOW_HEIGHT);
-		glEnd();
-	}
+	   for (int i = 0; i < triangle_count; i++) {
+		   glBegin(GL_TRIANGLES);
+		   glColor3f(1.f, 0.f, 0.f);
+		   // glColor3f(colors[i % 3][0], colors[i % 3][1], colors[i % 3][2]);
+		   glVertex2f(balls->position.x / WINDOW_WIDTH, balls->position.y / WINDOW_HEIGHT);
+		   glVertex2f((balls->position.x + point[i].x) / WINDOW_WIDTH, (balls->position.y + point[i].y) / WINDOW_HEIGHT);
+		   glVertex2f((balls->position.x + point[i + 1].x) / WINDOW_WIDTH,
+						  (balls->position.y + point[i + 1].y) / WINDOW_HEIGHT);
+		   glEnd();
+	   }
 }
 
 void update_balls(t_ball* balls) {
+	balls->speed.x -= balls->acceleration.x;
 	balls->speed.y -= balls->acceleration.y;
-	if (balls->speed.x > 0 && (balls->position.x + balls->r) >= WINDOW_WIDTH)
-		balls->speed.x = -balls->speed.x * balls->friction;
-	else if (balls->speed.x < 0 && (balls->position.x - balls->r) <= -WINDOW_WIDTH)
-		balls->speed.x = -balls->speed.x * balls->friction;
-	if (balls->speed.y > 0 && (balls->position.y + balls->r) >= WINDOW_HEIGHT)
-		balls->speed.y = -balls->speed.y * balls->friction;
-	else if (balls->speed.y < 0 && (balls->position.y - balls->r) <= -WINDOW_HEIGHT)
-		balls->speed.y = -balls->speed.y * balls->friction;
-	balls->position.x += balls->speed.x;
-	balls->position.y += balls->speed.y;
+	float next_x = balls->position.x + balls->speed.x;
+	float next_y = balls->position.y + balls->speed.y;
+
+	if (next_x + balls->r > WINDOW_WIDTH) {
+		next_x = WINDOW_WIDTH - balls->r;
+		balls->speed.x = -balls->speed.x * balls->rebouce;
+	} else if (next_x - balls->r < -WINDOW_WIDTH) {
+		next_x = -WINDOW_WIDTH + balls->r;
+		balls->speed.x = -balls->speed.x * balls->rebouce;
+	}
+
+	if (next_y + balls->r > WINDOW_HEIGHT) {
+		next_y = WINDOW_HEIGHT - balls->r;
+		balls->speed.y = -balls->speed.y * balls->rebouce;
+	} else if (next_y - balls->r < -WINDOW_HEIGHT) {
+		next_y = -WINDOW_HEIGHT + balls->r;
+		balls->speed.y = -balls->speed.y * balls->rebouce;
+		balls->speed.x = balls->speed.x * balls->friction;
+	}
+
+	balls->position.x = next_x;
+	balls->position.y = next_y;
 }
 
 int main() {
