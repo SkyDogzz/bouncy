@@ -1,9 +1,12 @@
 #ifndef BOUNCY__H
 #define BOUNCY__H
 
+#define GL_GLEXT_PROTOTYPES
+#define GLFW_INCLUDE_GLCOREARB
 #include <GLFW/glfw3.h>
 #include <math.h>
 #include <stdbool.h>
+#include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -24,23 +27,26 @@
 #define SCENE_REBOUCE 1 - 0.1
 #define SCENE_FRICTION 1 - 0.0005
 
-#define BALLS_COUNT 10000
-#define BALLS_ITERATION 16
+#define BALLS_COUNT 1000
+#define BALLS_ITERATION 32
 
 extern const float colors[6][3];
 
-typedef struct vec2 {
+typedef struct vec2
+{
   float x;
   float y;
 } t_vec2;
 
-typedef struct ball {
+typedef struct ball
+{
   t_vec2 position;
   int r;
   t_vec2 speed;
 } t_ball;
 
-typedef struct scene {
+typedef struct scene
+{
   bool running;
   float dt;
   double last_fps_time;
@@ -48,6 +54,11 @@ typedef struct scene {
   int frames;
   int viewport_width;
   int viewport_height;
+  GLuint program;
+  GLuint vao;
+  GLuint vbo;
+  float *vertices;
+  size_t vertex_capacity;
 
   t_ball **balls;
   int balls_count;
@@ -57,17 +68,18 @@ typedef struct scene {
   t_vec2 acceleration;
 } t_scene;
 
-void key_handler(GLFWwindow *window, int key, int scancode, int action,
-                 int mods);
+void key_handler (GLFWwindow *window, int key, int scancode, int action, int mods);
 
-bool init_scene(t_scene *scene);
-void draw(t_scene *scene);
-void update(t_scene *scene);
-void free_scene(t_scene *scene);
+bool init_scene (t_scene *scene);
+void draw (t_scene *scene);
+void update (t_scene *scene);
+void free_scene (t_scene *scene);
 
-void init_balls(t_scene *scene);
-void free_balls(t_ball **balls);
-void draw_balls(t_scene *scene);
-void update_balls(t_scene *scene);
+void init_balls (t_scene *scene);
+void free_balls (t_ball **balls);
+void draw_balls (t_scene *scene);
+void update_balls (t_scene *scene);
+bool init_renderer (t_scene *scene);
+void free_renderer (t_scene *scene);
 
 #endif

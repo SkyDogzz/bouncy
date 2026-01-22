@@ -19,6 +19,7 @@ OBJ_PATH := obj/
 SRC := main.c \
 			 balls.c \
 			 scene.c \
+			 render.c \
 			 handler.c
 
 SRCS := $(addprefix $(SRC_PATH), $(SRC))
@@ -43,5 +44,24 @@ fclean: clean
 
 re: fclean all
 
-.PHONY: all clean fclean re
+format:
+	@set -e; \
+	cfg_dir=""; \
+	dir="$$(pwd)"; \
+	home="$$HOME"; \
+	while [ "$$dir" != "/" ]; do \
+		if [ -f "$$dir/.clang-format" ]; then cfg_dir="$$dir"; break; fi; \
+		if [ "$$dir" = "$$home" ]; then break; fi; \
+		dir="$$(dirname "$$dir")"; \
+	done; \
+	if [ -z "$$cfg_dir" ] && [ -f "$$home/.clang-format" ]; then cfg_dir="$$home"; fi; \
+	if [ -z "$$cfg_dir" ]; then echo "No .clang-format found from $$PWD to $$HOME"; exit 1; fi; \
+	echo "Using $$cfg_dir/.clang-format"; \
+	find ./src ./include -type f \( -name '*.c' -o -name '*.h' \) -print | \
+	while IFS= read -r f; do \
+		tmp="$$(mktemp)"; \
+		clang-format-12 -style=file -assume-filename="$$cfg_dir/_.c" < "$$f" > "$$tmp"; \
+		mv "$$tmp" "$$f"; \
+	done
 
+.PHONY: all clean fclean re format
