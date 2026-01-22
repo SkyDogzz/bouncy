@@ -1,5 +1,7 @@
 #include "bouncy.h"
 
+const float colors[4][3] = {{1.f, 0.f, 0.f}, {0.f, 1.f, 0.f}, {0.f, 0.f, 1.f}, {1.f, 1.f, 0.f}};
+
 int main() {
 	t_scene scene;
 	if (!init_scene(&scene)) {

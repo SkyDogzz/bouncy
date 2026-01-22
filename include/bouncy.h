@@ -20,7 +20,7 @@
 #define BALLS_COUNT 25
 #define BALLS_ITERATION 32
 
-static float colors[4][3] = {{1.f, 0.f, 0.f}, {0.f, 1.f, 0.f}, {0.f, 0.f, 1.f}, {1.f, 1.f, 0.f}};
+extern const float colors[4][3];
 
 typedef struct vec2 {
 	float x;
